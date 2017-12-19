@@ -72,13 +72,13 @@ def bfsi(G, source, d = 0, OUTPUT = {}, TO_VISIT = deque([])):
     
     #if no neighbor or all neighbors already visited
     if len (G.neighbors(source)) == 0 or len([e for e in G.neighbors(source) if e in OUTPUT.keys()]) == len(G.neighbors(source)): 
-        return OUTPUT
-    
-    for neighbor in G.neighbors(source):
-        #add them into the To_VISIT queue and into the visited nodes
-        if (neighbor not in OUTPUT.keys()):
-            TO_VISIT.append((neighbor, hop+1))
-            OUTPUT[neighbor] = hop+1
+        pass
+    else:
+        for neighbor in G.neighbors(source):
+            #add them into the To_VISIT queue and into the visited nodes
+            if (neighbor not in OUTPUT.keys()):
+                TO_VISIT.append((neighbor, hop+1))
+                OUTPUT[neighbor] = hop+1
         
     #while there is something to visit
     while(len(TO_VISIT) != 0):
@@ -101,8 +101,65 @@ def bfsi(G, source, d = 0, OUTPUT = {}, TO_VISIT = deque([])):
     return OUTPUT
 
 
+#function to compute the shortest path weight from a source node to a destination
+#this function is just an addaptation of the bfsi function above
+def shortest_path(G, source, destination):
+    #OUTPUT = {1:0}: dictionary of nodes already visited, key node and value the number of hops to get there from the source
+    #TO_VISIT = deque([]): FIFO queue of nodes to visit
+    
+    weight = 0
+    OUTPUT = {}
+    OUTPUT[source] = 0
+    TO_VISIT = deque([])
+    
+    #if no neighbor
+    if len (G.neighbors(source)) == 0: 
+        pass
+    else:
+        for neighbor in G.neighbors(source):
+            #add them into the To_VISIT queue and into the visited nodes
+            if (neighbor not in OUTPUT.keys()):
+                TO_VISIT.append((neighbor, weight + G.edge[source][neighbor]['weight']))
+                OUTPUT[neighbor] = weight + G.edge[source][neighbor]['weight']
+        
+    #while there is something to visit
+    while(len(TO_VISIT) != 0):
+        #remove the first element from the queue and visit it (FIFO)
+        node = TO_VISIT.popleft()
+        
+        #if no neighbor
+        if len (G.neighbors(node[0])) == 0: 
+            pass
+        else:
+            for neighbor in G.neighbors(node[0]):
+                #add them into the To_VISIT queue and into the visited nodes
+                #if the neighbor is not visited yet add it into the to visited queue and into the already visited dictionary
+                if (neighbor not in OUTPUT.keys()):
+                    TO_VISIT.append((neighbor, node[1]+G.edge[node[0]][neighbor]['weight']))
+                    OUTPUT[neighbor] = node[1]+G.edge[node[0]][neighbor]['weight']
+                #if the neighbor is yet visited, check if the actual weight is less than the old one and replace if it does
+                else:
+                    if (node[1]+G.edge[node[0]][neighbor]['weight'] < OUTPUT[neighbor]):
+                        TO_VISIT.append((neighbor, node[1]+G.edge[node[0]][neighbor]['weight']))
+                        OUTPUT[neighbor] = node[1]+G.edge[node[0]][neighbor]['weight']
+                    
+    #we are done visiting everything so we can return the output dictionary
+    if destination in OUTPUT.keys():
+        return OUTPUT[destination]
+    else:
+        return None
 
  
+
+def GroupNumbers(G, I):
+    OUTPUT = {}
+    
+    for node in G.nodes():
+        sp = [shortest_path(G, node, u) for u in I]
+        OUTPUT[node] = min(i for i in sp if i is not None)
+        
+    return OUTPUT
+
     
 '''...The code...''' 
 ###first question
@@ -285,4 +342,49 @@ print('Elapsed time: ', elapsed_time)
 
 
 
+
 ###third question
+#ask the author id from the user
+author = int(input ("Insert an author ID: "))
+
+#for the time computation
+start_time = time.time()
+
+#let's find author ID of aris anagnostopoulos
+for node in G.node:
+    if(G.node[node]['author'] == 'aris anagnostopoulos'):
+        ArisID = G.node[node]['author_id']
+        break
+
+
+Shortest_Paths = shortest_path(G, author, ArisID)
+
+elapsed_time = time.time() - start_time
+print('...shortest path weight calculation completed...')
+print('Elapsed time: ', elapsed_time)
+
+#for the time computation
+start_time = time.time()
+
+Shortest_Paths2 = nx.dijkstra_path_length(G, author, ArisID)
+
+elapsed_time = time.time() - start_time
+print('...shortest path weight calculation using the networkx function completed...')
+print('Elapsed time: ', elapsed_time)
+
+print(Shortest_Paths == Shortest_Paths2)
+
+
+#Write a Python software that takes in input a subset of nodes (cardinality smaller than
+#21) and returns, for each node of the graph, its GroupNumber
+
+I = [int(e) for e in input("Insert a list of author ID's separated by spaces: ").strip().split()]
+
+#for the time computation
+start_time = time.time()
+
+GNumbers = GroupNumbers(G, I)
+
+elapsed_time = time.time() - start_time
+print('...GroupNumber\'s computation completed...')
+print('Elapsed time: ', elapsed_time)

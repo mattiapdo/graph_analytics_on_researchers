@@ -5,160 +5,9 @@ start_time = time.time()
 import json
 import networkx as nx
 import matplotlib.pyplot as plt
-from collections import deque
+import Libhw4 as lb
 
 
-
-
-'''...Some usefull fuctions for the code...'''
-#function tu remove duplicate from list of dictionaries
-def setDict(L):    
-    D = dict()
-    for l in L: D[l['author_id']] = l
-    output = list(D.values())
-    return output
-
-#function to remove element of the second list from the first list
-def Remove(L1, L2):
-    return [x for x in L1 if x not in L2]
-    
-#function to compute the jaccard similarity between two sets of publication
-def J(p1, p2):
-    return len(set(p1).intersection(p2))/len(set(p1).union(p2))
-
-#recursive version which could raise RecursionError: maximum recursion depth exceeded while calling a Python object
-#for deep searchs
-
-#function to implement the breath first traversal and return a dictionary with all nodes as keys and the number of hop from source to the node as values 
-def bfsr(G, source, d, OUTPUT = {}, TO_VISIT = deque([]), hop = 0, flag = 1):
-    #OUTPUT = {1:0}: dictionary of nodes already visited, key node and value the number of hops to get there from the source
-    #TO_VISIT = deque([]): FIFO queue of nodes to visit
-    
-    #if first iteration add the source with 0 as number of hops
-    if (flag == 1):
-        OUTPUT[source] = 0
-        flag = 0
-        
-    #if no neighbor or all neighbors already visited
-    if len (G.neighbors(source)) == 0 or len([e for e in G.neighbors(source) if e in OUTPUT.keys()]) == len(G.neighbors(source)): 
-        return OUTPUT
-    
-    for neighbor in G.neighbors(source):
-        #add them into the To_VISIT queue and into the visited nodes
-        if (neighbor not in OUTPUT.keys()):
-            TO_VISIT.append((neighbor, hop+1))
-            OUTPUT[neighbor] = hop+1
-        
-    #while there is something to visit
-    while(len(TO_VISIT) != 0):
-        #remove the first element from the queue and visit it (FIFO)
-        node = TO_VISIT.popleft()
-        
-        if (node[1] + 1 <= 2):
-            bfsr(G, node[0], d, OUTPUT, TO_VISIT, node[1], flag = 0)
-        
-    #we are done visiting everything so we can return the output dictionary
-    return OUTPUT
-
-  
-#iterative version
-#function to implement the breath first traversal and return a dictionary with all nodes as keys and the number of hop from source to the node as values 
-def bfsi(G, source, d = 0, OUTPUT = {}, TO_VISIT = deque([])):
-    #OUTPUT = {1:0}: dictionary of nodes already visited, key node and value the number of hops to get there from the source
-    #TO_VISIT = deque([]): FIFO queue of nodes to visit
-    
-    hop = 0
-    OUTPUT[source] = 0
-    
-    #if no neighbor or all neighbors already visited
-    if len (G.neighbors(source)) == 0 or len([e for e in G.neighbors(source) if e in OUTPUT.keys()]) == len(G.neighbors(source)): 
-        pass
-    else:
-        for neighbor in G.neighbors(source):
-            #add them into the To_VISIT queue and into the visited nodes
-            if (neighbor not in OUTPUT.keys()):
-                TO_VISIT.append((neighbor, hop+1))
-                OUTPUT[neighbor] = hop+1
-        
-    #while there is something to visit
-    while(len(TO_VISIT) != 0):
-        #remove the first element from the queue and visit it (FIFO)
-        node = TO_VISIT.popleft()
-        
-        if (node[1] + 1 <= 2):
-            #if no neighbor or all neighbors already visited
-            if len (G.neighbors(node[0])) == 0 or len([e for e in G.neighbors(node[0]) if e in OUTPUT.keys()]) == len(G.neighbors(node[0])): 
-                pass
-            else:
-                for neighbor in G.neighbors(node[0]):
-                    #add them into the To_VISIT queue and into the visited nodes
-                    if (neighbor not in OUTPUT.keys()):
-                        TO_VISIT.append((neighbor, node[1]+1))
-                        OUTPUT[neighbor] = node[1]+1
-                        
-                    
-    #we are done visiting everything so we can return the output dictionary
-    return OUTPUT
-
-
-#function to compute the shortest path weight from a source node to a destination
-#this function is just an addaptation of the bfsi function above
-def shortest_path(G, source, destination):
-    #OUTPUT = {1:0}: dictionary of nodes already visited, key node and value the number of hops to get there from the source
-    #TO_VISIT = deque([]): FIFO queue of nodes to visit
-    
-    weight = 0
-    OUTPUT = {}
-    OUTPUT[source] = 0
-    TO_VISIT = deque([])
-    
-    #if no neighbor
-    if len (G.neighbors(source)) == 0: 
-        pass
-    else:
-        for neighbor in G.neighbors(source):
-            #add them into the To_VISIT queue and into the visited nodes
-            if (neighbor not in OUTPUT.keys()):
-                TO_VISIT.append((neighbor, weight + G.edge[source][neighbor]['weight']))
-                OUTPUT[neighbor] = weight + G.edge[source][neighbor]['weight']
-        
-    #while there is something to visit
-    while(len(TO_VISIT) != 0):
-        #remove the first element from the queue and visit it (FIFO)
-        node = TO_VISIT.popleft()
-        
-        #if no neighbor
-        if len (G.neighbors(node[0])) == 0: 
-            pass
-        else:
-            for neighbor in G.neighbors(node[0]):
-                #add them into the To_VISIT queue and into the visited nodes
-                #if the neighbor is not visited yet add it into the to visited queue and into the already visited dictionary
-                if (neighbor not in OUTPUT.keys()):
-                    TO_VISIT.append((neighbor, node[1]+G.edge[node[0]][neighbor]['weight']))
-                    OUTPUT[neighbor] = node[1]+G.edge[node[0]][neighbor]['weight']
-                #if the neighbor is yet visited, check if the actual weight is less than the old one and replace if it does
-                else:
-                    if (node[1]+G.edge[node[0]][neighbor]['weight'] < OUTPUT[neighbor]):
-                        TO_VISIT.append((neighbor, node[1]+G.edge[node[0]][neighbor]['weight']))
-                        OUTPUT[neighbor] = node[1]+G.edge[node[0]][neighbor]['weight']
-                    
-    #we are done visiting everything so we can return the output dictionary
-    if destination in OUTPUT.keys():
-        return OUTPUT[destination]
-    else:
-        return None
-
- 
-
-def GroupNumbers(G, I):
-    OUTPUT = {}
-    
-    for node in G.nodes():
-        sp = [shortest_path(G, node, u) for u in I]
-        OUTPUT[node] = min(i for i in sp if i is not None)
-        
-    return OUTPUT
 
     
 '''...The code...''' 
@@ -206,18 +55,18 @@ with open('reduced_dblp.json') as json_data:
                 
             #if authors already in inverted index
             if author['author_id'] in AUTHORS_NEIGHBOURS.keys():
-                #update the value with key author in the sort of inverted index dictionary
+                #update the value with key author in the inverted index dictionary
                 #we add all the authors in the actual conference into the list of neighbours removing duplicates
-                AUTHORS_NEIGHBOURS[author['author_id']] = [ AUTHORS_NEIGHBOURS[author['author_id']][0] + Remove([elem['author_id'] for elem in conference["authors"]], [author['author_id']]), list(set(AUTHORS_NEIGHBOURS[author['author_id']][1] + [conference['id_publication_int']])), list(set(AUTHORS_NEIGHBOURS[author['author_id']][2] + [conference['id_conference_int']])) ]
+                AUTHORS_NEIGHBOURS[author['author_id']] = [ AUTHORS_NEIGHBOURS[author['author_id']][0] + lb.Remove([elem['author_id'] for elem in conference["authors"]], [author['author_id']]), list(set(AUTHORS_NEIGHBOURS[author['author_id']][1] + [conference['id_publication_int']])), list(set(AUTHORS_NEIGHBOURS[author['author_id']][2] + [conference['id_conference_int']])) ]
                 #if authors not already in inverted index
             else:
                 #add author in inverted index setting the list of neighbours to all the authors in the actual conference removing duplicates
-                AUTHORS_NEIGHBOURS[author['author_id']] = [[author['author_id'] for author in setDict(Remove(conference["authors"], [author]))], [conference['id_publication_int']], [conference['id_conference_int']] ]
+                AUTHORS_NEIGHBOURS[author['author_id']] = [[author['author_id'] for author in lb.setDict(lb.Remove(conference["authors"], [author]))], [conference['id_publication_int']], [conference['id_conference_int']] ]
     
     
     #now let's insert the the AUTHORS_TO_INSERT in the graph as nodes or vertices
     for author in AUTHORS_TO_INSERT.values():
-        G.add_node(author['author_id'], **author)
+        G.add_node(author['author_id'], **{'author': author['author']})
 
 
     #now let's create all the edges using the inverted index (AUTHORS_NEIGHBOURS)
@@ -230,7 +79,7 @@ with open('reduced_dblp.json') as json_data:
             #w(a1, a2) = 1 - J(p1, p2)
             p1 = AUTHORS_NEIGHBOURS[author][1]
             p2 = AUTHORS_NEIGHBOURS[neighbour][1]
-            G.add_edge(author, neighbour, weight = 1 - J(p1, p2))  
+            G.add_edge(author, neighbour, weight = 1 - lb.J(p1, p2))  
 
 
 elapsed_time = time.time() - start_time
@@ -261,7 +110,7 @@ for author in AUTHORS_NEIGHBOURS.keys():
 #create the subgraph
 SUB_G_1 = G.subgraph(AUTHORS_FOR_SUBGRAPH)
 
-#degree centralitiese computation
+#degree centralities computation
 DEGREE = nx.degree_centrality(SUB_G_1)
 #plot the degree centralities
 plt.clf()
@@ -315,7 +164,7 @@ d = int(input ("Insert an integer d: "))
 start_time = time.time()
 
 #Calling bfsr wich return a dictionary with nodes matching requirements as keys and hop-distances as values
-Hops = bfsi(G, author, d)
+Hops = lb.bfsi(G, author, d)
     
 SUB_G_2 = G.subgraph(list(Hops.keys()))
 
@@ -357,7 +206,7 @@ for node in G.node:
         break
 
 
-Shortest_Paths = shortest_path(G, author, ArisID)
+Shortest_Paths = lb.shortest_path(G, author, ArisID)
 
 elapsed_time = time.time() - start_time
 print('...shortest path weight calculation completed...')
@@ -383,8 +232,8 @@ I = [int(e) for e in input("Insert a list of author ID's separated by spaces: ")
 #for the time computation
 start_time = time.time()
 
-GNumbers = GroupNumbers(G, I)
-
+GNumbers = lb.GroupNumbers(G, I)
+print(GNumbers)
 elapsed_time = time.time() - start_time
 print('...GroupNumber\'s computation completed...')
 print('Elapsed time: ', elapsed_time)

@@ -202,6 +202,9 @@ def GroupNumbers(G, I):
     
     for node in G.nodes():
         sp = [shortest_path(G, node, u) for u in I]
-        OUTPUT[node] = min(i for i in sp if i is not None)
+        if (len([i for i in sp if i is not None]) == 0):
+            OUTPUT[node] = None
+        else:
+            OUTPUT[node] = min([i for i in sp if i is not None])
         
     return OUTPUT

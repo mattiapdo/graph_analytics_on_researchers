@@ -6,6 +6,7 @@ import json
 import networkx as nx
 import matplotlib.pyplot as plt
 import Libhw4 as lb
+import pprint as pp
 
 
 
@@ -202,7 +203,7 @@ start_time = time.time()
 #let's find author ID of aris anagnostopoulos
 for node in G.node:
     if(G.node[node]['author'] == 'aris anagnostopoulos'):
-        ArisID = G.node[node]['author_id']
+        ArisID = node
         break
 
 
@@ -218,7 +219,7 @@ start_time = time.time()
 Shortest_Paths2 = nx.dijkstra_path_length(G, author, ArisID)
 
 elapsed_time = time.time() - start_time
-print('...shortest path weight calculation using the networkx function completed...')
+print('\n\n...shortest path weight calculation using the networkx function completed...')
 print('Elapsed time: ', elapsed_time)
 
 print(Shortest_Paths == Shortest_Paths2)
@@ -233,7 +234,7 @@ I = [int(e) for e in input("Insert a list of author ID's separated by spaces: ")
 start_time = time.time()
 
 GNumbers = lb.GroupNumbers(G, I)
-print(GNumbers)
+pp.pprint(GNumbers)
 elapsed_time = time.time() - start_time
 print('...GroupNumber\'s computation completed...')
 print('Elapsed time: ', elapsed_time)

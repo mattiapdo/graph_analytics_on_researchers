@@ -44,7 +44,7 @@ def bfsr(G, source, d, OUTPUT = {}, TO_VISIT = deque([]), hop = 0, flag = 1):
         #remove the first element from the queue and visit it (FIFO)
         node = TO_VISIT.popleft()
         
-        if (node[1] + 1 <= 2):
+        if (node[1] + 1 <= d):
             bfsr(G, node[0], d, OUTPUT, TO_VISIT, node[1], flag = 0)
         
     #we are done visiting everything so we can return the output dictionary
@@ -75,7 +75,7 @@ def bfsi(G, source, d = 0, OUTPUT = {}, TO_VISIT = deque([])):
         #remove the first element from the queue and visit it (FIFO)
         node = TO_VISIT.popleft()
         
-        if (node[1] + 1 <= 2):
+        if (node[1] + 1 <= d):
             #if no neighbor or all neighbors already visited
             if len (G.neighbors(node[0])) == 0 or len([e for e in G.neighbors(node[0]) if e in OUTPUT.keys()]) == len(G.neighbors(node[0])): 
                 pass

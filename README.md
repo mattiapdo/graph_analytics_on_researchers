@@ -184,3 +184,56 @@ This function as the previous implements the breath first traversal and construc
     
     we are done visiting everything so we can return the output dictionary
     return OUTPUT
+
+
+#### module Libhw4.py
+
+In this module, we implemented 4 main functions which are bfsr(), bfsi(), shortest_path() and GroupNumbers().
+the two bfs functions as already been explain previously.
+
+now let's explain the shortest_path() function:
+
+the goal of this function is to compute the shortest path weight from a source to a destination node,
+this function is just an addaptation of the bfsi used function above.
+
+The logic:
+
+(a) it creates a dictionary of nodes already visited (OUTPUT)
+  
+  - key = node
+  - value = number of hops to get there from the source
+
+(b) we make use of a FIFO queue of nodes to visit (TO_VISIT)
+
+.
+
+    if no neighbor
+        pass
+    else
+        for each neighbor in all neighbors of the source
+            add them into the To_VISIT queue as a set
+            (neighbour, weight of the edge between source and the neighbor)
+            add them into the OUTPUT dictionary
+            (key = neighbour, value = weight of the edge between source and the neighbor)
+    
+    while there is something to visit
+        remove the first element from the queue in order to visit it (FIFO)
+        
+        if no neighbor
+            pass
+        else
+            for neighbor in all neighbors of the actual node
+                if the neighbor is not visited yet 
+                    add it into the to visited queue as a set
+                    (neighbour, weight of the edge between source and the neighbor)
+                    and into the OUTPUT dictionary
+                    (key = neighbour, value = weight of the actual node + weight of the edge between actual node and the neighbor)
+                
+                if the neighbor is yet visited
+                    check if the actual weight is less than the old one and replace if it does
+    
+    we are done visiting everything so we can return the shortest path weight for the source
+    if destination is in the OUTPUT dictionary
+        return OUTPUT[destination]
+    else
+        return None

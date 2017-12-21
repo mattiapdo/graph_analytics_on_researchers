@@ -188,7 +188,7 @@ This function as the previous implements the breath first traversal and construc
 
 #### module Libhw4.py
 
-In this module, we implemented 4 main functions which are bfsr(), bfsi(), shortest_path() and GroupNumbers().
+In this module, we implemented 3 main functions which are bfsr(), bfsi() and shortest_path().
 the two bfs functions as already been explain previously.
 
 now let's explain the shortest_path() function:

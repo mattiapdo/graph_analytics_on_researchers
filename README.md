@@ -194,7 +194,7 @@ the two bfs functions as already been explain previously.
 now let's explain the shortest_path() function:
 
 the goal of this function is to compute the shortest path weight from a source to a destination node,
-this function is just an addaptation of the bfsi used function above.
+this function is just an addaptation of the bfsi function used above.
 
 The logic:
 

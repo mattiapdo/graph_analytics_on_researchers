@@ -138,63 +138,6 @@ def shortest_path(G, source, destination):
         return OUTPUT[destination]
     else:
         return None
-
-#this version of the shortest path computation function follows the Dijkstra's logic
-def our_dijkstra(G, source, goal):
-    
-    for node in G.nodes():
-        #set all nodes as not visited  - creating an apposite attribute
-        G.node[node]['visited'] = False
-        #set, for all nodes the tentative distance as infinity
-        G.node[node]['tentative_dist'] = float("inf")
-        
-    
-    import heapq as hp
-    # set current node on source node
-    current = source
-    #print('current', current)
-    # set source node as visited
-    G.node[current]['visited'] = True
-    #print("G.node[current]['visited']", current)
-    # set the tentative distance of current node (source) as zero
-    G.node[current]['tentative_dist'] = float(0)
-    #print("tentative_dist", G.node[current]['tentative_dist'])
-    #here a heap that contains tuples: for each node we have:
-    #(tentative distance from source, node id)
-    #tentatives = [(G.node[current]['tentative_dist'], current)]
-    tentatives = []
-    #print('tentatives', tentatives)
-    #print('courrent', current, 'neigh', list(G.neighbors(current)))
-    # while current node has neighbours and current node is not our goal node...
-    while G.neighbors(current) and current != goal:
-        #print('current', current)
-        for neighbour in list(G.neighbors(current)):
-            #print('\tneighbour', neighbour, 'visitato?', G.node[neighbour]['visited'])
-            #if neighbour has NOT been visited:
-            if G.node[neighbour]['visited'] == False:
-                # set his tentative distance as the minimum between
-                # its pre-stored tentative distance and 
-                # the sum of current's tentative distance and the weigth that links current with neighbour
-                
-                '''print('\t\t', 
-                     G.node[neighbour]['tentative_dist'],'\n\t\t',
-                     G.node[current]['tentative_dist']+ G[current][neighbour]['weight'])'''
-                                                          
-                G.node[neighbour]['tentative_dist'] = min(G.node[neighbour]['tentative_dist'], 
-                                                          G.node[current]['tentative_dist']+
-                                                          G[current][neighbour]['weight'])
-                #print(G.node[neighbour]['tentative_dist'])
-                # push the updated tentative distance in tentatives in the following format:
-                # ( updated tentative distance , neighbour )
-                hp.heappush(tentatives, (G.node[neighbour]['tentative_dist'], neighbour))
-                
-        #print('*')
-        #print('tentatives: ',tentatives)
-        current = hp.heappop(tentatives)[1]
-        G.node[current]['visited'] = True
-    # the shortest path's distance between source node and goal node is the tentative distance
-    # of the goal node
-    return G.node[goal]['tentative_dist']
     
 
 def GroupNumbers(G, I):

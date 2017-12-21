@@ -1,3 +1,4 @@
+#%%
 import time
 start_time = time.time()
 
@@ -40,6 +41,7 @@ AUTHORS_NEIGHBOURS = {}
 
 #let's take the data from the json file
 with open('reduced_dblp.json') as json_data:
+    
     data = json.load(json_data)
     
     # for each conference in the json file
@@ -83,7 +85,7 @@ elapsed_time = time.time() - start_time
 print('...data loaded...\n...graph creation completed...')
 print('Elapsed time: ', elapsed_time)    
 
-
+#%%
 
 ###second question
 #given a conference in input, return the subgraph induced by the set of authors who
@@ -113,7 +115,7 @@ SUB_G_1 = G.subgraph(AUTHORS_FOR_SUBGRAPH)
 elapsed_time = time.time() - start_time
 print('\n...first subgraph creation completed...')
 print('Elapsed time: ', elapsed_time)
-
+#%%
 print('\n**************************\n',
       'Here are some statistics',
       '\n**************************\n')
@@ -158,7 +160,7 @@ plt.show()
 elapsed_time = time.time() - start_time
 print('...centrality measures computation done...\n...histograms creation done...')
 print('Elapsed time: ', elapsed_time)
-
+#%%
 print('\n****************************************************************************\n',
       'Given in input an author and an integer d the program returns the subgraph\n', 
       'induced by the nodes that have hop distance at most equal to d', 
@@ -170,44 +172,55 @@ author = int(input ("Insert an author ID: "))
 #ask the integer d from the user, for example 5
 d = int(input ("Insert an integer d: "))
 
-print('Choose what function you wish to use in order to compare the computation times'
+print('\nChoose what function you wish to use in order to compare the computation times'
       '\n1 for iterative breath first search algorithm',
       '\n2 for recursive breath first search algorithm',
       '\n3 for networkx.ego_graph()\n'
-      '  essentially based on single source Dijkstra')
+      '  essentially based on single source Dijkstra',
+      '\ne to exit\n')
 choice = input()
-if choice == '1': 
-    #for the time computation
-    start_time = time.time()
-    #Calling bfsr wich return a dictionary with nodes matching requirements as keys and hop-distances as values
-    Hops = lb.bfsi(G, author, d)
-    #create the subgraph
-    SUB_G_2 = G.subgraph(list(Hops.keys()))
-    elapsed_time = time.time() - start_time
-    print('\n...subgraph creation completed...\nElapsed time: ', elapsed_time)
-elif choice == '2': 
-    #for the time computation
-    start_time = time.time()
-    #Calling bfsr wich return a dictionary with nodes matching requirements as keys and hop-distances as values
-    Hops = lb.bfsr(G, author, d)
-    #create the subgraph
-    SUB_G_2 = G.subgraph(list(Hops.keys()))
-    elapsed_time = time.time() - start_time
-    print('\n...subgraph creation completed...\nElapsed time: ', elapsed_time)
-elif choice == '3': 
-    #for the time computation
-    start_time = time.time()
-    #create the subgraph
-    SUB_G_2 = nx.ego_graph(G, author, radius=d)
-    elapsed_time = time.time() - start_time
-    print('\n...subgraph creation completed...\nElapsed time: ', elapsed_time)
-
+while choice != 'e':
+    if choice == '1': 
+        #for the time computation
+        start_time = time.time()
+        #Calling bfsr wich return a dictionary with nodes matching requirements as keys and hop-distances as values
+        Hops = lb.bfsi(G, author, d)
+        #create the subgraph
+        SUB_G_2 = G.subgraph(list(Hops.keys()))
+        elapsed_time = time.time() - start_time
+        print('\n...subgraph creation completed...\nElapsed time: ', elapsed_time)
+    elif choice == '2': 
+        #for the time computation
+        start_time = time.time()
+        #Calling bfsr wich return a dictionary with nodes matching requirements as keys and hop-distances as values
+        Hops = lb.bfsr(G, author, d)
+        #create the subgraph
+        SUB_G_2 = G.subgraph(list(Hops.keys()))
+        elapsed_time = time.time() - start_time
+        print('\n...subgraph creation completed...\nElapsed time: ', elapsed_time)
+    elif choice == '3': 
+        #for the time computation
+        start_time = time.time()
+        #create the subgraph
+        SUB_G_2 = nx.ego_graph(G, author, radius=d)
+        elapsed_time = time.time() - start_time
+        print('\n...subgraph creation completed...\nElapsed time: ', elapsed_time)
+    else: print('\nError: insert a valid choice\n')
+        
+    print('\nChoose what function you wish to use in order to compare the computation times'
+      '\n1 for iterative breath first search algorithm',
+      '\n2 for recursive breath first search algorithm',
+      '\n3 for networkx.ego_graph()\n'
+      '  essentially based on single source Dijkstra\n',
+      'e to exit\n')
+    choice = input()
 
 print('\n**********************************\n',
       "Now let's visualise the subgraph", 
       '\n**********************************\n')
 
-
+print('\n...plotting the graph...\n')
+start_time = time.time()
 # positions for all nodes
 pos=nx.spring_layout(SUB_G_2)
 # nodes
@@ -222,8 +235,10 @@ plt.savefig("graph-hop distance at most equal to d.png", dpi = 300)
 # display
 plt.show()
 
+elapsed_time = time.time() - start_time
+print('Elapsed time: ', elapsed_time)
 
-
+#%%
 print('\n***************************************************************************\n',
       'takes in input an author (id) and returns the weight of the shortest path\n',
       'that connects the input author with Aris.', 
@@ -241,26 +256,38 @@ for node in G.node:
         ArisID = node
         break
 
-print('Choose what function you wish to use in order to compare the computation times',
-      '\n1 for Libhw4.shortest_path()',
-      '\n2 for nx.dijkstra_path_length()\n')
+print('\nChoose what function you wish to use in order to compare the computation times',
+          '\n1 for Libhw4.shortest_path()',
+          '\n2 for nx.dijkstra_path_length()',
+          '\ne to exit')
 choice = input()
-if choice == '1': 
-    start_time = time.time()
-    Shortest_Paths = lb.shortest_path(G, author, ArisID)
-    elapsed_time = time.time() - start_time
-    print('\n...shortest path weight calculation completed...')
-    print('\tElapsed time: ', elapsed_time)
+while choice != 'e':
+    if choice == '1':  
+        start_time = time.time()
+        Shortest_Paths = lb.shortest_path(G, author, ArisID)
+        print('\nShortest path between Aris and', author, 'is',
+              Shortest_Paths,'\n')
+        elapsed_time = time.time() - start_time
+        print('\n...shortest path weight calculation completed...')
+        print('\tElapsed time: ', elapsed_time)
 
-if choice == '2': 
-    start_time = time.time()
-    Shortest_Paths3 = nx.dijkstra_path_length(G, author, ArisID)
-    elapsed_time = time.time() - start_time
-    print('\n...shortest path weight calculation using the networkx function completed...')
-    print('\tElapsed time: ', elapsed_time)
+    elif choice == '2': 
+        start_time = time.time()
+        Shortest_Paths = nx.dijkstra_path_length(G, author, ArisID)
+        print('\nShortest path between Aris and', author, 'is',
+              Shortest_Paths,'\n')
+        elapsed_time = time.time() - start_time
+        print('\n...shortest path weight calculation using the networkx function completed...')
+        print('\tElapsed time: ', elapsed_time)
 
+    else: print('\nError: insert a valid choice')
 
-
+    print('Choose what function you wish to use in order to compare the computation times',
+          '\n1 for Libhw4.shortest_path()',
+          '\n2 for nx.dijkstra_path_length()',
+          '\ne to exit')
+    choice = input()
+#%%
 #Write a Python software that takes in input a subset of nodes (cardinality smaller than
 #21) and returns, for each node of the graph, its GroupNumber
 print('\n********************************************\n',
@@ -274,7 +301,9 @@ while len(I) >21:
 
 #for the time computation
 start_time = time.time()
+print('*')
 GNumbers = lb.GroupNumbers(G, I)
+print('**')
 pp.pprint(GNumbers)
 elapsed_time = time.time() - start_time
 print('...GroupNumber\'s computation completed...')

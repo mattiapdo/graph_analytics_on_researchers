@@ -141,8 +141,8 @@ def shortest_path(G, source, destination):
     
 
 #This function takes in input a graph, a set/list of nodes and returns the dictionary
-#which contains all the nodes of the graph as keys and the shortest path from u to the other nodes of the graph
-#as values, for each u in nodes_set'''
+#which contains all the nodes of the graph as keys and the lowest shortest path from u to the other nodes of the graph
+#as values, for each u in nodes_set
 def GroupNumbers(G, nodes_set):
 
     #OUTPUT dictionary: structure {author_id1:(shortest_path, corresponding node in I), ...}

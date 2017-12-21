@@ -188,8 +188,9 @@ This function as the previous implements the breath first traversal and construc
 
 #### module Libhw4.py
 
-In this module, we implemented 3 main functions which are bfsr(), bfsi() and shortest_path().
-the two bfs functions as already been explain previously.
+In this module, we implemented 4 main functions which are bfsr(), bfsi(), shortest_path() and GroupNumbers().
+the two bfs functions have already been explain previously.
+
 
 now let's explain the shortest_path() function:
 
@@ -237,3 +238,21 @@ The logic:
         return OUTPUT[destination]
     else
         return None
+
+
+now let's explain the GroupNumbers() function:
+
+the goal here is to return a dictionary containing all the nodes of the graph as keys and the lowest shortest path from u to the other nodes of the graph as values, for each u in nodes_set.
+
+this function just compute for each value in the input nodes_set the shortest path from them to all the other nodes in the graph.
+in this way every time the values that are greter in the OUTPUT dictionary are going to be overwrite by the ones that are lower.
+
+Exemple:
+graph_nodes = [a, b, c, d, e]
+nodes_set = [a, b, c]
+shortest path from a to all other nodes:
+OUTPUT = {a: 0, b: 2, c:1, d:5, e:6}
+shortest path from b to all other nodes:
+here we check d(b, a) < OUTPUT[a]? No then we do nothing
+otherwise we update OUTPUT[a].
+

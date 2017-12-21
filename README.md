@@ -248,11 +248,11 @@ this function just compute for each value in the input nodes_set the shortest pa
 in this way every time the values that are greter in the OUTPUT dictionary are going to be overwrite by the ones that are lower.
 
 Exemple:
-graph_nodes = [a, b, c, d, e]
-nodes_set = [a, b, c]
-shortest path from a to all other nodes:
-OUTPUT = {a: 0, b: 2, c:1, d:5, e:6}
-shortest path from b to all other nodes:
-here we check d(b, a) < OUTPUT[a]? No then we do nothing
+graph_nodes = [a, b, c, d, e]  
+nodes_set = [a, b, c]  
+shortest path from a to all other nodes:  
+OUTPUT = {a: 0, b: 2, c:1, d:5, e:6}  
+shortest path from b to all other nodes:  
+here we check d(b, a) < OUTPUT[a]? No then we do nothing  
 otherwise we update OUTPUT[a].
 

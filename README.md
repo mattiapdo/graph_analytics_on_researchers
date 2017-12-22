@@ -14,6 +14,7 @@
 	 {publication_id_1, publication_id_2,...}, 
 	 {conference_id_1, conference_id_2,...}],   .... }
 	
+	initialize the inverted dictionary
 	AUTHORS_NEIGHBOURS = {}
 
 	let's take the data from the json file

@@ -1,20 +1,17 @@
 from collections import deque
 
-'''...Some usefull fuctions for the code...'''
-#function tu remove duplicate from list of dictionaries
-def setDict(L):    
-    D = dict()
-    for l in L: D[l['author_id']] = l
-    output = list(D.values())
-    return output
+'''...Some usefull fuctions for the code...'''    
 
-#function to remove element of the second list from the first list
-def Remove(L1, L2):
-    return [x for x in L1 if x not in L2]
-    
+#this function returns 
+# True if the nodes are neighbours
+# False if the nodes are not neighbours
+def nodes_connected(G, u, v):
+    if u not in G or v not in G: return False
+    return u in G.neighbors(v)
+
 #function to compute the jaccard similarity between two sets of publication
 def J(p1, p2):
-    return len(set(p1).intersection(p2))/len(set(p1).union(p2))
+    return len(p1.intersection(p2))/len(p1.union(p2))
 
 #recursive version which could raise RecursionError: maximum recursion depth exceeded while calling a Python object
 #for deep searchs
@@ -141,8 +138,8 @@ def shortest_path(G, source, destination):
     
 
 #This function takes in input a graph, a set/list of nodes and returns the dictionary
-#which contains all the nodes of the graph as keys and the lowest shortest path from u to the other nodes of the graph
-#as values, for each u in nodes_set
+#which contains all the nodes of the graph as keys and the shortest path from u to the other nodes of the graph
+#as values, for each u in nodes_set'''
 def GroupNumbers(G, nodes_set):
 
     #OUTPUT dictionary: structure {author_id1:(shortest_path, corresponding node in I), ...}

@@ -1,8 +1,6 @@
 #%%
-import time
-start_time = time.time()
-
 '''...importing some usefull library...'''
+import time
 import json
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -10,23 +8,13 @@ import Libhw4 as lb
 import pprint as pp
 
 
-    
+start_time = time.time()    
 '''...The code...''' 
 ###first question
 
 #creation of an empty graph G
 G = nx.Graph()
-
-#dictionary of authors that will be added in the graph after populating it
-#structure:
-# {author_id_1: authordict1
-#  author_id_1: authordict1
-#  .
-#  .
-#  .
-#  }
-AUTHORS_TO_INSERT = {}
-
+G.Name = 'Authors'
 
 #inverted index dictionary that contains as keys Authors and as values neighbours, publications and conferences
 #structure:
@@ -38,52 +26,82 @@ AUTHORS_TO_INSERT = {}
 #    }
 AUTHORS_NEIGHBOURS = {}
 
-
 #let's take the data from the json file
-with open('reduced_dblp.json') as json_data:
-    
+with open('full_dblp.json') as json_data:
     data = json.load(json_data)
-    
-    # for each conference in the json file
-    for conference in data:
-        
-        #for each author in this conference
-        for author in conference['authors']:
-            #if the author is not yet in the list of authors to insert
-            if author not in AUTHORS_TO_INSERT.values():
-                #insert it into the list of authors to insert
-                AUTHORS_TO_INSERT[author['author_id']] = author
+    # for each publication in the json file
+    for publication in data:
+        #for each author in the current publication,
+        for author in publication['authors']:
+            #if author not already inserted in the graph
+            if author['author_id'] not in AUTHORS_NEIGHBOURS.keys():
+                #create an empty field for the current author in the inverted index
+                AUTHORS_NEIGHBOURS[author['author_id']] = [set([]),set([]),set([])]
+                #add a node in the graph storing the author_id as node and the author name as attribute
+                G.add_node(author['author_id'], author = author['author'])
+                                
+                #let's modify the set of neighbors, publications and conferences for this author
+                neighbours = set([publication['authors'][i]['author_id'] for i in range(len(publication['authors']))])
+                publications = set([publication['id_publication_int']]) 
+                conferences = set([publication['id_conference_int']])
                 
-            #if authors already in inverted index
-            if author['author_id'] in AUTHORS_NEIGHBOURS.keys():
-                #update the value with key author in the inverted index dictionary
-                #we add all the authors in the actual conference into the list of neighbours removing duplicates
-                AUTHORS_NEIGHBOURS[author['author_id']] = [ AUTHORS_NEIGHBOURS[author['author_id']][0] + lb.Remove([elem['author_id'] for elem in conference["authors"]], [author['author_id']]), list(set(AUTHORS_NEIGHBOURS[author['author_id']][1] + [conference['id_publication_int']])), list(set(AUTHORS_NEIGHBOURS[author['author_id']][2] + [conference['id_conference_int']])) ]
-            #if authors not already in inverted index
+                #update values in the inverted index
+                AUTHORS_NEIGHBOURS[author['author_id']][0] = AUTHORS_NEIGHBOURS[author['author_id']][0].union(neighbours)
+                AUTHORS_NEIGHBOURS[author['author_id']][1] = AUTHORS_NEIGHBOURS[author['author_id']][1].union(publications)
+                AUTHORS_NEIGHBOURS[author['author_id']][2] = AUTHORS_NEIGHBOURS[author['author_id']][2].union(conferences)
+                
+                #for each neighbor of the current author,
+                for neighbour in neighbours :
+                    #if the authors aren't connected yet,
+                    if not lb.nodes_connected(G, author['author_id'], neighbour) and author['author_id'] != neighbour:
+                        #then connect them
+                        G.add_edge(author['author_id'], neighbour)
+            
+            #if the author is already in the graph,
             else:
-                #add author in inverted index setting the list of neighbours to all the authors in the actual conference removing duplicates
-                AUTHORS_NEIGHBOURS[author['author_id']] = [[author['author_id'] for author in lb.setDict(lb.Remove(conference["authors"], [author]))], [conference['id_publication_int']], [conference['id_conference_int']] ]
-    
-    #now let's insert the the AUTHORS_TO_INSERT in the graph as nodes or vertices
-    for author in AUTHORS_TO_INSERT.values():
-        G.add_node(author['author_id'], **{'author': author['author']})
-        
-    #now let's create all the edges using the inverted index (AUTHORS_NEIGHBOURS)
-    #for each auhtor id in the inverted index
-    for author in AUTHORS_NEIGHBOURS.keys():
-        #for each neighbour id in the list of neighbours
-        for neighbour in AUTHORS_NEIGHBOURS[author][0]:
-            #add new edge between author and neighbour
-            #also computing the weights of each node
-            #w(a1, a2) = 1 - J(p1, p2)
-            p1 = AUTHORS_NEIGHBOURS[author][1]
-            p2 = AUTHORS_NEIGHBOURS[neighbour][1]
-            G.add_edge(author, neighbour, weight = 1 - lb.J(p1, p2))  
+                #let's modify the set of neighbors, publications and conferences for this author
+                neighbours = set([publication['authors'][i]['author_id'] for i in range(len(publication['authors']))])
+                publications = set([publication['id_publication_int']])     
+                conferences = set([publication['id_conference_int']])
+                
+                #update values in the inverted index
+                AUTHORS_NEIGHBOURS[author['author_id']][0] = AUTHORS_NEIGHBOURS[author['author_id']][0].union(neighbours)
+                AUTHORS_NEIGHBOURS[author['author_id']][1] = AUTHORS_NEIGHBOURS[author['author_id']][1].union(publications)
+                AUTHORS_NEIGHBOURS[author['author_id']][2] = AUTHORS_NEIGHBOURS[author['author_id']][2].union(conferences)
+                  
+                #for each neighbor of the current author,
+                for neighbour in neighbours :
+                    #if the authors aren't connected yet,
+                    if not lb.nodes_connected(G, author['author_id'], neighbour) and author['author_id'] != neighbour:
+                        #then connect them
+                        G.add_edge(author['author_id'], neighbour)
+                
+                
+            
 
 
 elapsed_time = time.time() - start_time
-print('...data loaded...\n...graph creation completed...')
+print('\n...data loaded...\n...graph creation completed...')
 print('Elapsed time: ', elapsed_time)    
+print('\n',nx.info(G))
+
+
+start_time= time.time()
+
+#for each author (already inserted in the graph)
+for author in AUTHORS_NEIGHBOURS.keys():
+    #for each neighbor of the current author (from the inverted index)
+    for neighbour in AUTHORS_NEIGHBOURS[author][0]:
+        #if they are connected,
+        if lb.nodes_connected(G, author, neighbour):
+            #compute the weight of the edge
+            #between author and neighbour
+            #w(a1, a2) = 1 - J(p1, p2) 
+            G[author][neighbour]['weight'] = 1 - lb.J(AUTHORS_NEIGHBOURS[author][1], AUTHORS_NEIGHBOURS[neighbour][1])
+            
+elapsed_time = time.time() - start_time
+print('\n...weights computation completed...')
+print('Elapsed time: ', elapsed_time)
 
 #%%
 
@@ -301,10 +319,11 @@ while len(I) >21:
 
 #for the time computation
 start_time = time.time()
-print('*')
+
 GNumbers = lb.GroupNumbers(G, I)
-print('**')
+
 pp.pprint(GNumbers)
+print('Author: (Min Shortest Path, Best Input Node)\n')
 elapsed_time = time.time() - start_time
 print('...GroupNumber\'s computation completed...')
 print('Elapsed time: ', elapsed_time)

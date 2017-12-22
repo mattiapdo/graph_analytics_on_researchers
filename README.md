@@ -31,7 +31,6 @@
 
 		    else, if the author is already in the graph,
 			let's modify the set of neighbors, publications and conferences for this author
-	
 			update values in the inverted index
 		
 			for each neighbor of the current author,

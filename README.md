@@ -1,58 +1,52 @@
 # ADM-HW4
 
-###Excercise 1
+### Excercise 1
 
 
-we want to build two dictionaries:
+	creation of an empty graph G
+	G = nx.Graph()
+	G.Name = 'Authors'
 
-    AUTHORS_TO_INSERT = {author_id_1: authordict1, author_id_2:...}
-    AUTHORS_NEIGHBOURS = {author_id_1: [[neighbour_id_1, neighbour_id_2, neighbour_id_3,...], [publication_id_1, publication_id_2,...], [conference_id_1, conference_id_2,...]], author_id_2 : ...}
+	inverted index dictionary that contains as keys Authors and as values 
+	neighbours, publications and conferences
+	structure:
+	{author_id_1: [{neighbour_id_1, neighbour_id_2,...}, 
+	 {publication_id_1, publication_id_2,...}, 
+	 {conference_id_1, conference_id_2,...}],   .... }
+	
+	AUTHORS_NEIGHBOURS = {}
 
-The inverted index AUTHORS_NEIGHBOURS is going to be used during the creation of edges and also during the looking out of authors who published in a given conference at least once.
+	let's take the data from the json file
+	    for each publication in the json file
+		for each author in the current publication,
+		    if author not already inserted in the graph
+			create an empty field for the current author in the inverted index
+			add a node in the graph storing the author_id as node and the author name as attribute
+			let's modify the set of neighbors, publications and conferences for this author
+			update values in the inverted index
+			
+			for each neighbor of the current author,
+			    if the authors aren't connected yet,
+				then connect them
 
-Taking the data from the json file:
-    
-    for each conference in the json file
+		    else, if the author is already in the graph,
+			let's modify the set of neighbors, publications and conferences for this author
+	
+			update values in the inverted index
+		
+			for each neighbor of the current author,
+			    if the authors aren't connected yet,
+				then connect them
 
-      for each author in that conference
-      
-              if the author is not yet in the list of authors to insert
-                  insert it into the list of authors to insert
-                  
-              if author already in the inverted index
-                  update the value with key author in the inverted index
-                  here we add all the authors in the actual conference into the 
-                  list of neighbours removing duplicates
-                  We also add the current publication in the list of publications
-                  and the current conference in the list of conferences
-                  
-              if the author not already in inverted index
-                  add author in inverted index setting the dictionary of
-                  neighbours to all the authors in the actual conference
-                  removing duplicates,
-                  setting the list of publications to the actual publication
-                  and the list of conferences to the actual conference
-
-Building the graph:
-    
-    here we use the first dictionary (AUTHORS_TO_INSERT) 
-    to add nodes to the graph: we add as node value the author_id and as attribut the author_name
-    
-    we use the second dictionary (the inverted index AUTHORS_NEIGHBOURS) to add edges:
-    
-    for each author_id in AUTHORS_NEIGHBOURS    
-        for each neighbour id in the list of neighbours
-            add new edge between author_id and neighbour
-            also computing the weight of each node:
-              w(a1, a2) = 1 - J(p1, p2)
-    	     where p1 and p2 are the sets of publications 
-    	     respectively of the author and the neighbour
-    	     and the set of publications here are still taken from the inverted index
-    	     The function J() which computes the jaccard similarity is written in the file
-    	     Libhw4.py
-
+	for each author (already inserted in the graph)
+	    for each neighbor of the current author (from the inverted index)
+		if they are connected,
+		    compute the weight of the edge
+		    between author and neighbour
+		    w(a1, a2) = 1 - J(p1, p2) 
+		    
           
-###Excercise 2.a
+### Excercise 2.a
 
 Given a conference in input, return the subgraph induced by the set of authors who published at the input conference at least once.
 
@@ -82,7 +76,7 @@ Do some statistics
     plot the betweeness centralities        
 
 
-###Excercise 2.b
+### Excercise 2.b
 
 
 Given in input an author and an integer d, get the subgraph induced by the nodes that have hop distance (i.e., number of edges) at most equal to d with the input author.
@@ -248,6 +242,7 @@ this function just compute for each value in the input nodes_set the shortest pa
 in this way every time the values that are greter in the OUTPUT dictionary are going to be overwrite by the ones that are lower.
 
 Exemple:
+
 graph_nodes = [a, b, c, d, e]  
 nodes_set = [a, b, c]  
 shortest path from a to all other nodes:  
